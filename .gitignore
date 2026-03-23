@@ -1,0 +1,44 @@
+# 🔹 Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 🔹 Virtual environments
+venv/
+env/
+.venv/
+
+# 🔹 Environment variables
+.env
+
+# 🔹 Flask instance folder
+instance/
+
+# 🔹 SQLite database
+*.db
+*.sqlite3
+
+# 🔹 Logs
+*.log
+
+# 🔹 VS Code
+.vscode/
+
+# 🔹 OS files
+.DS_Store
+Thumbs.db
+
+# 🔹 Build / dist
+build/
+dist/
+*.egg-info/
+
+# 🔹 Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 🔹 Migrations (optional, if using Flask-Migrate)
+migrations/
+
+# Project
