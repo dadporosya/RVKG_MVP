@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+import logging
 
 # from project import dbManager as _dbManager
 # from project import config
@@ -8,10 +9,16 @@ import dbManager as _dbManager
 import config
 import userManager as _userManager
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+
 app = Flask(__name__)
 dbManager = _dbManager.DbManager(config.DB_PATH)
 userManager = _userManager.UserManager(dbManager)
 
+logging.warning("user logined with the invalid username")
+logging.error("unable to reach '/processLogin'")
+
+DEBUG = True
 # @app.route("/")
 # def home():
 #     return render_template("index.html")
@@ -20,9 +27,12 @@ userManager = _userManager.UserManager(dbManager)
 def login():
     return render_template("loginPage.html")
 
+
 @app.route("/processLogin", methods=["GET", "POST"])
 def processLogin():
-    print("Process Login")
+    if DEBUG:
+        logging.info("Start process login")
+
     usernameIn = ''
     userPasswordIn = ''
 
@@ -31,16 +41,23 @@ def processLogin():
         userPasswordIn = request.form.get("password")
     
     exist = userManager.login(usernameIn, userPasswordIn)
-
+        
     if exist:
+        if DEBUG:
+            logging.debug(f"Successful login by Username: {usernameIn}, Password: {userPasswordIn}")
         return render_template("successfulLogin.html")
 
     logMessage = "Account not found! Please, sign up first!"
+    if DEBUG:
+            logging.debug(f"Unsuccessful login by Username: {usernameIn}, Password: {userPasswordIn}")
     return render_template("registrationPage.html", logMessage=logMessage)
 
 
 @app.route("/registration", methods=["GET", "POST"])
 def registration():
+    if DEBUG:
+        logging.info("Registration")
+
     usernameIn = ''
     userPasswordIn = ''
     userFirstName = ''
@@ -58,6 +75,9 @@ def registration():
         "First name": userFirstName,
         "Last name": userLastName
     }
+    
+    if DEBUG:
+        logging.debug(f"Registration args: {', '.join(data.values())}")
     
     successfulRegistration = True
     logMessage = ""

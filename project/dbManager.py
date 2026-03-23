@@ -83,7 +83,7 @@ class DbManager:
 
         with self.con:
             i = self.selectData(query)[0][0]
-            if i:
+            if type(i) == int:
                 return i + 1
             return 0
 
