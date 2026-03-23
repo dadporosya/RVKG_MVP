@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block header %}
+    <h1>Test title</h1>
+{% endblock %}
+
+{% block content %}
+    <p>Welcome to the homepage.</p>
+    
+    <h3>Enter username</h3>
+    <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="Your name">
+        <button type="submit">Submit</button>
+    </form>
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
