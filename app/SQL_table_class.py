@@ -55,6 +55,9 @@ if __name__ == "__main__":
               Row("value", "INTEGER", fk=True, connectedTable="table2", connectedValue="value"))
 
     print(t.create())
+    print(Row("id", "TEXT", pk = True).create())
+    print(Row("value", "INTEGER", fk=True, connectedTable="table2", connectedValue="value").create())
+
 
 
 

@@ -15,13 +15,7 @@ app = Flask(__name__)
 dbManager = _dbManager.DbManager(config.DB_PATH)
 userManager = _userManager.UserManager(dbManager)
 
-logging.warning("user logined with the invalid username")
-logging.error("unable to reach '/processLogin'")
-
 DEBUG = True
-# @app.route("/")
-# def home():
-#     return render_template("index.html")
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -82,7 +76,7 @@ def registration():
     successfulRegistration = True
     logMessage = ""
     if userManager.checkIfUserExists(username = usernameIn):
-        logMessage += "Username has benn already taken! Choose a new one!"
+        logMessage += "Username has been already taken! Choose a new one!"
 
     incorrectData = []
     for k, v in data.items():

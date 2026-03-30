@@ -22,7 +22,7 @@ class DbManager:
             for table in tables:
                 self.con.execute(table.create())
             self.con.commit()
-            
+
     def executemany(self, sql:str, data:tuple[tuple]) -> None:
         with self.con:
             self.con.executemany(sql, data)
@@ -86,9 +86,10 @@ class DbManager:
 
         with self.con:
             i = self.selectData(query)[0][0]
-            if type(i) == int:
-                return i + 1
-            return 0
+            try:
+                return int(i) + 1
+            except:
+                return 0
 
     def addUser(self, *args, userId=-1):
         if userId<=-1:
