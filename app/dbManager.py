@@ -1,25 +1,28 @@
 import sqlite3 as sql3
+from SQL_table_class import Table, Row
 
 class DbManager:
     def __init__(self, path="db.db"):
         self.path = path
         self.con = sql3.connect(self.path, check_same_thread=False)
         self.cur = self.con.cursor()
-        self.createTables()
+        self.tables = (
+            Table("users",
+                  Row("id", "TEXT", pk=True),
+                  Row("username", "TEXT"),
+                  Row("password", "TEXT"),
+                  Row("firstname", "TEXT"),
+                  Row("secondName", "TEXT"),
+                  )
+        , )
+        self.createTables(self.tables)
 
-    def createTables(self):
+    def createTables(self, tables:tuple[Table, ...]):
         with self.con:
-            self.con.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY,
-                    username TEXT,
-                    password TEXT,
-                    firstName TEXT,
-                    secondName TEXT
-                )
-            """)
+            for table in tables:
+                self.con.execute(table.create())
             self.con.commit()
-
+            
     def executemany(self, sql:str, data:tuple[tuple]) -> None:
         with self.con:
             self.con.executemany(sql, data)
@@ -73,7 +76,7 @@ class DbManager:
         """
 
         with self.con:
-            return bool(self.selectData(query, (userId,))[0][0]) 
+            return bool(self.selectData(query, (username,))[0][0])
     
 
     def getNextFreeId(self) -> int:
@@ -88,9 +91,9 @@ class DbManager:
             return 0
 
     def addUser(self, *args, userId=-1):
-
         if userId<=-1:
             userId = self.getNextFreeId()
+
         query = """
             INSERT INTO users (id, username, password, firstName, secondName)
             VALUES (?, ?, ?, ?, ?)
