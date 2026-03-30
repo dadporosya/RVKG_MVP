@@ -46,3 +46,4 @@ migrations/
 # Project
 app/temp/
 app/__pycache__/
+tests/__pycache__/
