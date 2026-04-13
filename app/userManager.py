@@ -1,6 +1,7 @@
 # from project import dbManager as _dbManager
 
 import dbManager as _dbManager
+import PasswordManager as pMan
 
 
 class UserManager:
@@ -15,8 +16,10 @@ class UserManager:
         
         return False
     
-    def addUser(self, *args):
-        self.dbManager.addUser(*args)
+    def addUser(self, username, password, *args):
+        password = pMan.hash(password)
+        return self.dbManager.addUser(username, password, *args)
     
     def login(self, username:str, password:str):
+        password = pMan.hash(password)
         return self.dbManager.userLogin(username, password)

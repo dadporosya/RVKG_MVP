@@ -1,3 +1,5 @@
+import _helpers as h
+
 class Row:
     def __init__(self,
                 name:str,
@@ -22,7 +24,7 @@ class Row:
             return row
 
         if self.fk and self.connectedTable is not None:
-            row += f",\nFOREIGN KEY ({self.name}) REFERENCES {self.connectedTable}({self.connectedValue})"
+            row = f"\nFOREIGN KEY ({self.name}) REFERENCES {self.connectedTable}({self.connectedValue})"
             return row
         return row
 
@@ -46,6 +48,7 @@ class Table:
                 {rows}
                 );
                 """)
+        # print(table)
         return table
 
 if __name__ == "__main__":

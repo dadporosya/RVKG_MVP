@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 import logging
 
 # from project import dbManager as _dbManager
@@ -8,17 +8,24 @@ import logging
 import dbManager as _dbManager
 import config
 import userManager as _userManager
+import _helpers as h
+import CookieManager as CookieMan
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 app = Flask(__name__)
-dbManager = _dbManager.DbManager(config.DB_PATH)
-userManager = _userManager.UserManager(dbManager)
+dbMan = _dbManager.DbManager(config.DB_PATH)
+userManager = _userManager.UserManager(dbMan)
 
 DEBUG = True
 
 @app.route("/", methods=["GET", "POST"])
 def login():
+    print(CookieMan.getCookie())
+    if dbMan.isUserLoggedIn(CookieMan.getCookie()):
+        return successfulLogin()
+
+
     return render_template("loginPage.html")
 
 
@@ -26,6 +33,10 @@ def login():
 def processLogin():
     if DEBUG:
         logging.info("Start process login")
+
+    print("COOKIE MAN COOK", CookieMan.getCookie())
+    if dbMan.isUserLoggedIn(CookieMan.getCookie()):
+        return successfulLogin()
 
     usernameIn = ''
     userPasswordIn = ''
@@ -37,15 +48,15 @@ def processLogin():
     exist = userManager.login(usernameIn, userPasswordIn)
         
     if exist:
-        if DEBUG:
-            logging.debug(f"Successful login by Username: {usernameIn}, Password: {userPasswordIn}")
-        return render_template("successfulLogin.html")
+        return successfulLogin()
 
     logMessage = "Account not found! Please, sign up first!"
-    if DEBUG:
-            logging.debug(f"Unsuccessful login by Username: {usernameIn}, Password: {userPasswordIn}")
     return render_template("registrationPage.html", logMessage=logMessage)
 
+def successfulLogin():
+    if DEBUG:
+        logging.debug(f"Successful login")
+    return render_template("successfulLogin.html")
 
 @app.route("/registration", methods=["GET", "POST"])
 def registration():
@@ -73,7 +84,7 @@ def registration():
     if DEBUG:
         logging.debug(f"Registration args: {', '.join(data.values())}")
     
-    successfulRegistration = True
+    successfulRegistrationFlag = True
     logMessage = ""
     if userManager.checkIfUserExists(username = usernameIn):
         logMessage += "Username has been already taken! Choose a new one!"
@@ -82,15 +93,36 @@ def registration():
     for k, v in data.items():
         if not v:
             incorrectData.append(k)
-            successfulRegistration = False
+            successfulRegistrationFlag = False
     
     logMessage += f"\nInvalid {", ".join(incorrectData)}"
 
-    if successfulRegistration:
-        userManager.addUser(usernameIn, userPasswordIn, userFirstName, userLastName)
-        return render_template("successfulLogin.html")
+    if successfulRegistrationFlag:
+        return successfulRegistration(usernameIn, userPasswordIn, userFirstName, userLastName)
     
     return render_template("registrationPage.html", logMessage=logMessage)
+
+def successfulRegistration(usernameIn, userPasswordIn, userFirstName, userLastName):
+    data = userManager.addUser(usernameIn, userPasswordIn, userFirstName, userLastName)
+
+    response = make_response(render_template("successfulLogin.html"))
+
+    cookie = CookieMan.generateCookie()
+    dbMan.saveCookie(data[0], cookie)
+    dbMan.setCookieLoggedIn(cookie, True)
+
+    response = CookieMan.setCookie(response, cookie)
+
+    return response
+
+
+@app.route("/set-cookie")
+def setCookie(userId:str|None=None):
+    cookie = CookieMan.generateCookie()
+    if userId:
+        dbMan.saveCookie(userId, cookie)
+
+    return CookieMan.setCookie(cookie=cookie)
 
 
 if __name__ == "__main__":
