@@ -58,6 +58,7 @@ def successfulLogin():
         logging.debug(f"Successful login")
     return render_template("successfulLogin.html")
 
+
 @app.route("/registration", methods=["GET", "POST"])
 def registration():
     if DEBUG:
