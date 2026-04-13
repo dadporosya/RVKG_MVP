@@ -107,7 +107,10 @@ def successfulRegistration(usernameIn, userPasswordIn, userFirstName, userLastNa
 
     response = make_response(render_template("successfulLogin.html"))
 
-    cookie = CookieMan.generateCookie()
+    cookie = dbMan.getCookieByUserId(data[0])
+    if not cookie:
+        cookie = CookieMan.generateCookie()
+
     dbMan.saveCookie(data[0], cookie)
     dbMan.setCookieLoggedIn(cookie, True)
 
